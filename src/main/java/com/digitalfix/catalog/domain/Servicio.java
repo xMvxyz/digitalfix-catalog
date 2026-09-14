@@ -31,6 +31,13 @@ public class Servicio {
 
     private String categoria;
 
+    /**
+     * Email del supervisor responsable del item. Null = sin asignar
+     * (cualquier Supervisor puede gestionarlo).
+     */
+    @Column(length = 320)
+    private String responsable;
+
     @Builder.Default
     @Column(nullable = false)
     private Boolean activo = true;

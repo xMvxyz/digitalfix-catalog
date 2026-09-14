@@ -45,6 +45,13 @@ public class Repuesto {
     @Column(nullable = false)
     private Integer stockMinimo = 5;
 
+    /**
+     * Email del supervisor responsable del item. Null = sin asignar
+     * (cualquier Supervisor puede gestionarlo).
+     */
+    @Column(length = 320)
+    private String responsable;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

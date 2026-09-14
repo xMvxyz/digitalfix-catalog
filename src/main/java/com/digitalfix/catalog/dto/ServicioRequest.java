@@ -11,5 +11,6 @@ public record ServicioRequest(
         @Size(max = 2000) String descripcion,
         @NotNull @Positive BigDecimal tarifa,
         @Size(max = 100) String categoria,
-        Boolean activo
+        Boolean activo,
+        @Size(max = 320) String responsable
 ) {}

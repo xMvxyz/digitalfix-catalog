@@ -12,6 +12,7 @@ public record RepuestoResponse(
         Integer stock,
         Integer stockMinimo,
         boolean stockBajo,
+        String responsable,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {}

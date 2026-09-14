@@ -10,6 +10,7 @@ public record ServicioResponse(
         BigDecimal tarifa,
         String categoria,
         Boolean activo,
+        String responsable,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {}

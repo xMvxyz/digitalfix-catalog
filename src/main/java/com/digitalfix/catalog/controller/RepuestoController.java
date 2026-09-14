@@ -36,30 +36,40 @@ public class RepuestoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RepuestoResponse create(@Valid @RequestBody RepuestoRequest req) {
-        return service.create(req);
+    public RepuestoResponse create(@Valid @RequestBody RepuestoRequest req,
+                                   @RequestHeader(value = "X-User-Email", required = false) String email,
+                                   @RequestHeader(value = "X-User-Role", required = false) String role) {
+        return service.create(req, email, role);
     }
 
     @PutMapping("/{id}")
-    public RepuestoResponse update(@PathVariable Long id, @Valid @RequestBody RepuestoRequest req) {
-        return service.update(id, req);
+    public RepuestoResponse update(@PathVariable Long id, @Valid @RequestBody RepuestoRequest req,
+                                   @RequestHeader(value = "X-User-Email", required = false) String email,
+                                   @RequestHeader(value = "X-User-Role", required = false) String role) {
+        return service.update(id, req, email, role);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id,
+                                       @RequestHeader(value = "X-User-Email", required = false) String email,
+                                       @RequestHeader(value = "X-User-Role", required = false) String role) {
+        service.delete(id, email, role);
         return ResponseEntity.noContent().build();
     }
 
     // Regla clave: descontar stock al asignar orden
     @PostMapping("/{id}/descontar")
-    public RepuestoResponse descontar(@PathVariable Long id, @Valid @RequestBody StockAdjustRequest req) {
-        return service.descontarStock(id, req.cantidad());
+    public RepuestoResponse descontar(@PathVariable Long id, @Valid @RequestBody StockAdjustRequest req,
+                                      @RequestHeader(value = "X-User-Email", required = false) String email,
+                                      @RequestHeader(value = "X-User-Role", required = false) String role) {
+        return service.descontarStock(id, req.cantidad(), email, role);
     }
 
     @PostMapping("/{id}/reponer")
-    public RepuestoResponse reponer(@PathVariable Long id, @Valid @RequestBody StockAdjustRequest req) {
-        return service.reponerStock(id, req.cantidad());
+    public RepuestoResponse reponer(@PathVariable Long id, @Valid @RequestBody StockAdjustRequest req,
+                                    @RequestHeader(value = "X-User-Email", required = false) String email,
+                                    @RequestHeader(value = "X-User-Role", required = false) String role) {
+        return service.reponerStock(id, req.cantidad(), email, role);
     }
 
     @PostMapping("/{id}/consumir")

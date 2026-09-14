@@ -30,18 +30,24 @@ public class ServicioController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ServicioResponse create(@Valid @RequestBody ServicioRequest req) {
-        return service.create(req);
+    public ServicioResponse create(@Valid @RequestBody ServicioRequest req,
+                                   @RequestHeader(value = "X-User-Email", required = false) String email,
+                                   @RequestHeader(value = "X-User-Role", required = false) String role) {
+        return service.create(req, email, role);
     }
 
     @PutMapping("/{id}")
-    public ServicioResponse update(@PathVariable Long id, @Valid @RequestBody ServicioRequest req) {
-        return service.update(id, req);
+    public ServicioResponse update(@PathVariable Long id, @Valid @RequestBody ServicioRequest req,
+                                   @RequestHeader(value = "X-User-Email", required = false) String email,
+                                   @RequestHeader(value = "X-User-Role", required = false) String role) {
+        return service.update(id, req, email, role);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id,
+                                       @RequestHeader(value = "X-User-Email", required = false) String email,
+                                       @RequestHeader(value = "X-User-Role", required = false) String role) {
+        service.delete(id, email, role);
         return ResponseEntity.noContent().build();
     }
 }

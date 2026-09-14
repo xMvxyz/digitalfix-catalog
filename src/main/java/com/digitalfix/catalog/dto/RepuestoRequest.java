@@ -13,5 +13,6 @@ public record RepuestoRequest(
         @NotBlank @Size(max = 50) String sku,
         @NotNull @Positive BigDecimal precio,
         @NotNull @Min(0) Integer stock,
-        @Min(0) Integer stockMinimo
+        @Min(0) Integer stockMinimo,
+        @Size(max = 320) String responsable
 ) {}

@@ -22,6 +22,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse.of(404, "Not Found", ex.getMessage(), req.getRequestURI()));
     }
 
+    @ExceptionHandler(CatalogAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(CatalogAccessDeniedException ex, HttpServletRequest req) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorResponse.of(403, "Forbidden", ex.getMessage(), req.getRequestURI()));
+    }
+
     @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<ErrorResponse> handleStock(InsufficientStockException ex, HttpServletRequest req) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponse.of(409, "Conflict", ex.getMessage(), req.getRequestURI()));

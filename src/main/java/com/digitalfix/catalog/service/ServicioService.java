@@ -3,6 +3,7 @@ package com.digitalfix.catalog.service;
 import com.digitalfix.catalog.domain.Servicio;
 import com.digitalfix.catalog.dto.ServicioRequest;
 import com.digitalfix.catalog.dto.ServicioResponse;
+import com.digitalfix.catalog.exception.CatalogAccessDeniedException;
 import com.digitalfix.catalog.exception.ConflictException;
 import com.digitalfix.catalog.exception.ResourceNotFoundException;
 import com.digitalfix.catalog.repository.ServicioRepository;
@@ -30,23 +31,28 @@ public class ServicioService {
     }
 
     @Transactional
-    public ServicioResponse create(ServicioRequest req) {
+    public ServicioResponse create(ServicioRequest req, String email, String role) {
+        assertSupervisor(role);
         if (repository.findByNombre(req.nombre()).isPresent()) {
             throw new ConflictException("Servicio ya existe con nombre: " + req.nombre());
         }
+        // Sin responsable explícito el item queda asignado a quien lo crea
+        String responsable = (req.responsable() == null || req.responsable().isBlank()) ? email : req.responsable();
         Servicio s = Servicio.builder()
                 .nombre(req.nombre())
                 .descripcion(req.descripcion())
                 .tarifa(req.tarifa())
                 .categoria(req.categoria())
                 .activo(req.activo() != null ? req.activo() : true)
+                .responsable(responsable)
                 .build();
         return toResponse(repository.save(s));
     }
 
     @Transactional
-    public ServicioResponse update(Long id, ServicioRequest req) {
+    public ServicioResponse update(Long id, ServicioRequest req, String email, String role) {
         Servicio s = getOrThrow(id);
+        assertCanManage(s.getResponsable(), email, role);
         repository.findByNombre(req.nombre()).ifPresent(other -> {
             if (!other.getId().equals(id)) throw new ConflictException("Otro servicio ya usa el nombre: " + req.nombre());
         });
@@ -55,12 +61,29 @@ public class ServicioService {
         s.setTarifa(req.tarifa());
         s.setCategoria(req.categoria());
         if (req.activo() != null) s.setActivo(req.activo());
+        if (req.responsable() != null) s.setResponsable(req.responsable().isBlank() ? null : req.responsable());
         return toResponse(repository.save(s));
     }
 
     @Transactional
-    public void delete(Long id) {
-        repository.delete(getOrThrow(id));
+    public void delete(Long id, String email, String role) {
+        Servicio s = getOrThrow(id);
+        assertCanManage(s.getResponsable(), email, role);
+        repository.delete(s);
+    }
+
+    private void assertSupervisor(String role) {
+        if (!"Supervisor".equalsIgnoreCase(role)) {
+            throw new CatalogAccessDeniedException("Solo el Supervisor puede gestionar el catálogo");
+        }
+    }
+
+    private void assertCanManage(String responsable, String email, String role) {
+        assertSupervisor(role);
+        if (responsable != null && !responsable.isBlank()
+                && (email == null || !responsable.equalsIgnoreCase(email))) {
+            throw new CatalogAccessDeniedException("El item está asignado a otro supervisor: " + responsable);
+        }
     }
 
     private Servicio getOrThrow(Long id) {
@@ -68,6 +91,6 @@ public class ServicioService {
     }
 
     private ServicioResponse toResponse(Servicio s) {
-        return new ServicioResponse(s.getId(), s.getNombre(), s.getDescripcion(), s.getTarifa(), s.getCategoria(), s.getActivo(), s.getCreatedAt(), s.getUpdatedAt());
+        return new ServicioResponse(s.getId(), s.getNombre(), s.getDescripcion(), s.getTarifa(), s.getCategoria(), s.getActivo(), s.getResponsable(), s.getCreatedAt(), s.getUpdatedAt());
     }
 }
