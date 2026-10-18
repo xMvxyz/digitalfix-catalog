@@ -112,8 +112,8 @@ public class RepuestoService {
     }
 
     private void assertSupervisor(String role) {
-        if (!"Supervisor".equalsIgnoreCase(role)) {
-            throw new CatalogAccessDeniedException("Solo el Supervisor puede gestionar el catálogo");
+        if (!"Supervisor".equalsIgnoreCase(role) && !"Admin".equalsIgnoreCase(role)) {
+            throw new CatalogAccessDeniedException("Solo Supervisor o Admin pueden gestionar el catálogo");
         }
     }
 
